@@ -1,0 +1,178 @@
+
+<!-- stock_prediction_assistant/frontend/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>智能股票预测助手</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .chart-container {
+            background: rgba(26, 32, 44, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div id="particles-js"></div>
+    <div class="container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                📈 智能股票预测助手
+            </h1>
+            <div class="flex space-x-4">
+                <button id="theme-toggle" class="text-xl">🌓</button>
+                <button id="refresh-btn" class="text-xl">🔄</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 股票搜索和自选股 -->
+            <div class="bg-gray-800 bg-opacity-70 p-6 rounded-xl">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-star mr-2 text-yellow-400"></i> 自选股管理
+                </h2>
+                <div class="flex mb-4">
+                    <input id="stock-search" type="text" placeholder="输入股票代码/名称" 
+                           class="flex-grow px-4 py-2 rounded-l-lg bg-gray-700 text-white focus:outline-none">
+                    <button id="search-btn" class="btn-primary px-4 py-2 rounded-r-lg">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <ul id="watchlist" class="space-y-2 max-h-60 overflow-y-auto">
+                    <!-- 自选股列表将通过JS动态生成 -->
+                </ul>
+            </div>
+
+            <!-- 主图表区域 -->
+            <div class="lg:col-span-2">
+                <div class="chart-container p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="stock-name" class="text-xl font-semibold">请选择股票</h2>
+                        <div class="flex space-x-2">
+                            <select id="timeframe" class="bg-gray-700 text-white px-3 py-1 rounded-lg">
+                                <option value="1d">1日</option>
+                                <option value="1w">1周</option>
+                                <option value="1m">1月</option>
+                                <option value="3m">3月</option>
+                                <option value="1y">1年</option>
+                            </select>
+                        </div>
+                    </div>
+                    <canvas id="stock-chart" class="w-full h-96"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 技术指标和预测区域 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div class="bg-gray-800 bg-opacity-70 p-6 rounded-xl">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-chart-line mr-2 text-blue-400"></i> 技术指标
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2">MACD</label>
+                        <div class="flex space-x-2">
+                            <input type="number" value="12" class="w-full bg-gray-700 text-white px-3 py-1 rounded-lg">
+                            <input type="number" value="26" class="w-full bg-gray-700 text-white px-3 py-1 rounded-lg">
+                            <input type="number" value="9" class="w-full bg-gray-700 text-white px-3 py-1 rounded-lg">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-2">KDJ</label>
+                        <div class="flex space-x-2">
+                            <input type="number" value="9" class="w-full bg-gray-700 text-white px-3 py-1 rounded-lg">
+                            <input type="number" value="3" class="w-full bg-gray-700 text-white px-3 py-1 rounded-lg">
+                            <input type="number" value="3" class="w-full bg-gray-700 text-white px-3 py-1 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+                <button id="apply-indicators" class="btn-primary mt-4 px-4 py-2 rounded-lg w-full">
+                    应用指标
+                </button>
+            </div>
+
+            <div class="bg-gray-800 bg-opacity-70 p-6 rounded-xl">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-crystal-ball mr-2 text-purple-400"></i> 趋势预测
+                </h2>
+                <div id="prediction-result" class="text-center py-8">
+                    <p class="text-gray-400">请先选择股票并加载数据</p>
+                </div>
+                <button id="run-prediction" class="btn-primary px-4 py-2 rounded-lg w-full">
+                    运行预测
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本加载 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/indicators.js"></script>
+    <script src="js/prediction.js"></script>
+    
+    <script>
+        // 粒子效果初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#3b82f6" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: "#3b82f6", opacity: 0.4, width: 1 },
+                    move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "grab" },
+                        onclick: { enable: true, mode: "push" }
+                    }
+                }
+            });
+
+            // 主题切换
+            document.getElementById('theme-toggle').addEventListener('click', function() {
+                document.body.classList.toggle('bg-gray-900');
+                document.body.classList.toggle('bg-gradient-to-br');
+            });
+
+            // 占位功能提示
+            const placeholders = ['search-btn', 'apply-indicators', 'run-prediction'];
+            placeholders.forEach(id => {
+                document.getElementById(id).addEventListener('click', function() {
+                    alert('该功能正在开发中，敬请期待！');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

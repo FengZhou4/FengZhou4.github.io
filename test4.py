@@ -10,6 +10,16 @@ data = ak.stock_zh_a_daily(symbol="sh600519",start_date='20230101',end_date='202
 print(data)
 df = data[['open', 'high', 'low', 'close']].copy()
 
+# #这个akshare代码底层是爬取东方财富的股票， 为啥没用新浪的接口， 主要是频繁爬取新浪财经-A 股-个股的历史行情数据, 容易封 IP。
+# df = ak.stock_zh_a_hist(
+#     symbol=_symbol,
+#     period=period_type,
+#     start_date=start.strftime("%Y%m%d"),
+#     end_date=end.strftime("%Y%m%d"),
+#     adjust="qfq"
+# )
+
+
 # 参数设置
 window = 20  # 移动平均窗口
 k = 2        # 标准差倍数

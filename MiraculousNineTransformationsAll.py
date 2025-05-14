@@ -160,7 +160,7 @@ def app():
         df_vol = analyzed_data[['volume']].copy()
         df_vol['vol_ma5'] = df_vol['volume'].rolling(5).mean()
         st.area_chart(df_vol, use_container_width=True)
-    my_stock=stock_info['code'].values.tolist()
+    my_stock=csi_300_df["品种代码"].values.tolist()
     for code in my_stock:
         # print(code)
         # 数据获取
@@ -197,5 +197,6 @@ def app():
 if __name__ == "__main__":
     stock_info = pd.read_csv('stock_info.csv')
     stock_info['code']=stock_info['代码'].apply(lambda x: str(x)[2:].zfill(6))
+    csi_300_df= pd.read_hdf('csi_300_df.h5', key='df')
     app()
 

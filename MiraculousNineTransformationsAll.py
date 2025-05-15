@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import akshare as ak
 import pandas as pd
@@ -7,6 +6,7 @@ import streamlit as st
 # AI算法工程师利用streamlit可以快速构建机器学习应用和高级数据分析可视化的用户界面。
 import plotly.graph_objects as go
 from datetime import datetime
+import time
 # 神奇九转核心算法
 def calculate_nine_turns(df):
     """计算九转序列"""
@@ -54,6 +54,7 @@ def get_asset_data(symbol, asset_type, start, end):
             '最高': 'high', '最低': 'low', '成交量': 'volume'
         })
         df['date'] = pd.to_datetime(df['date'])
+        time.sleep(1)
         return df.set_index('date').sort_index()
     except Exception as e:
         st.error(f"数据获取失败：{str(e)}")

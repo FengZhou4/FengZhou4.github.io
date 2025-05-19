@@ -23,6 +23,21 @@ import plotly.io as pio
 # pass
 
 
-csi_300_df= pd.read_csv('csi_300_df.csv')
-a=csi_300_df["品种代码"].values.tolist()
-pass
+# csi_300_df= pd.read_csv('csi_300_df.csv')
+# a=csi_300_df["品种代码"].values.tolist()
+# pass
+
+news = ak.stock_news_em(symbol='600519').head(5)
+news.to_csv('news.csv', index=False)
+print(news)
+
+
+
+
+
+
+
+
+
+
+
